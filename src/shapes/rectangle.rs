@@ -1,12 +1,30 @@
 use std::fmt::Display;
 
-use super::area::Area;
+use super::{area::Area, collisions::{Contains, Points}};
 
 pub struct Rectangle {
     pub x: f64,
     pub y: f64,
     pub height: f64,
     pub width: f64,
+}
+
+impl Contains for Rectangle {
+    fn contains_point(&self, (x, y): (f64, f64)) -> bool {
+        return self.x <= x && self.x + self.width >= x &&
+            self.y <= y && self.y + self.width >= y;
+    }
+}
+
+impl Points for Rectangle {
+    fn points(&self) -> super::collisions::PointIter {
+        return vec![
+            (self.x, self.y),
+            (self.x + self.width, self.y),
+            (self.x, self.y + self.height),
+            (self.x + self.width, self.y + self.height),
+        ].into();
+    }
 }
 
 impl Area for Rectangle {
