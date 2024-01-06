@@ -1,6 +1,9 @@
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
-use super::{area::Area, collisions::{Contains, Points}};
+use super::{
+    area::Area,
+    collisions::{Contains, Points},
+};
 
 pub struct Rectangle {
     pub x: f64,
@@ -11,8 +14,7 @@ pub struct Rectangle {
 
 impl Contains for Rectangle {
     fn contains_point(&self, (x, y): (f64, f64)) -> bool {
-        return self.x <= x && self.x + self.width >= x &&
-            self.y <= y && self.y + self.width >= y;
+        return self.x <= x && self.x + self.width >= x && self.y <= y && self.y + self.width >= y;
     }
 }
 
@@ -23,7 +25,8 @@ impl Points for Rectangle {
             (self.x + self.width, self.y),
             (self.x, self.y + self.height),
             (self.x + self.width, self.y + self.height),
-        ].into();
+        ]
+        .into();
     }
 }
 
@@ -51,5 +54,23 @@ impl Display for Rectangle {
             "Rectangle({}, {}): {}x{}",
             self.x, self.y, self.width, self.height
         );
+    }
+}
+
+impl FromStr for Rectangle {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let parts = s.split(" ").collect::<Vec<_>>();
+        if parts.len() != 4 {
+            return Err(anyhow::anyhow!("Not a rectangle!"));
+        }
+
+        return Ok(Rectangle {
+            x: parts[0].parse()?,
+            y: parts[1].parse()?,
+            width: parts[2].parse()?,
+            height: parts[3].parse()?,
+        });
     }
 }

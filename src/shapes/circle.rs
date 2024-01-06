@@ -1,6 +1,9 @@
-use std::f64::consts::PI;
+use std::{f64::consts::PI, fmt::Display, str::FromStr};
 
-use super::{area::Area, collisions::{Contains, Points}};
+use super::{
+    area::Area,
+    collisions::{Contains, Points},
+};
 
 pub struct Circle {
     pub x: f64,
@@ -26,5 +29,28 @@ impl Contains for Circle {
 impl Points for Circle {
     fn points(&self) -> super::collisions::PointIter {
         return vec![(self.x, self.y)].into();
+    }
+}
+
+impl Display for Circle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        return write!(f, "Circle({}, {}): {}", self.x, self.y, self.radius);
+    }
+}
+
+impl FromStr for Circle {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let parts = s.split(" ").collect::<Vec<_>>();
+        if parts.len() != 3 {
+            return Err(anyhow::anyhow!("Not a circle!"));
+        }
+
+        return Ok(Circle {
+            x: parts[0].parse()?,
+            y: parts[1].parse()?,
+            radius: parts[2].parse()?,
+        });
     }
 }
